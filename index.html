@@ -1,0 +1,175 @@
+<!--
+Programa: movimentação de 2 componentes 
+Turma: 2ºL
+Nome: Allex Silva Santana - Nº: 1  
+Nome: Fabrício da Silva Rojas - Nº: 9
+Nome: Pietro Andrade Lopes - Nº: 22
+DESCRIÇÃO: o programa faz com que quando voce aperte a tecla com a posição desejada, os componetes se movem para essa posição, quando a tecla é segurado, o componete vai pra direção ate a tecla ser solta, quando os 2 componentes se tocam, acontece uma colisao e o programa para para
+-->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <title>Movimento da Bola com Barreiras e Colisão</title>
+    <meta charset="UTF-8">
+    <style>
+        canvas {
+            background-color: #000000;
+            border: 1px solid #cccccc;
+        }
+        .instrucoes {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        var bola;
+        var bola2;
+        var movimento = { esquerda: false, direita: false, cima: false, baixo: false };
+        var movimentoBola2 = { esquerda: false, direita: false, cima: false, baixo: false };
+
+        function startGame() {
+            bola = new Bola(25, "blue", 475, 475);
+            bola2 = new Bola(25, "red", 25, 25);
+            myGameArea.start();
+            window.addEventListener("keydown", controlarMovimento);
+            window.addEventListener("keyup", pararMovimento);
+        }
+
+        var myGameArea = {
+            canvas: document.createElement("canvas"),
+            start: function () {
+                this.canvas.width = 500;
+                this.canvas.height = 500;
+                this.context = this.canvas.getContext('2d');
+                document.body.insertBefore(this.canvas, document.body.childNodes[1]);
+                this.interval = setInterval(updateGameArea, 20);
+            },
+
+            clear: function () {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            },
+
+            stop: function () {
+                clearInterval(this.interval);
+                alert("COLISÃO DETECTADA");
+            }
+        }
+
+        function Bola(tamanho, color, x, y) {
+            this.tamanho = tamanho;
+            this.x = x;
+            this.y = y;
+            this.color = color;
+
+            this.update = function () {
+                const ctx = myGameArea.context;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.tamanho, 0, 2 * Math.PI);
+                ctx.fill();
+            };
+
+            this.mover = function (movimento) {
+                if (movimento.direita && this.x + this.tamanho < myGameArea.canvas.width) {
+                    this.x += 5;
+                }
+                if (movimento.esquerda && this.x - this.tamanho > 0) {
+                    this.x -= 5;
+                }
+                if (movimento.cima && this.y - this.tamanho > 0) {
+                    this.y -= 5;
+                }
+                if (movimento.baixo && this.y + this.tamanho < myGameArea.canvas.height) {
+                    this.y += 5;
+                }
+            };
+        }
+
+        function updateGameArea() {
+            myGameArea.clear();
+            bola.mover(movimento);
+            bola.update();
+            bola2.mover(movimentoBola2);
+            bola2.update();
+            detectarColisao();
+        }
+
+        function detectarColisao() {
+            var dx = bola.x - bola2.x;
+            var dy = bola.y - bola2.y;
+            var distancia = Math.sqrt(dx * dx + dy * dy);
+
+            if (distancia <= bola.tamanho + bola2.tamanho) {
+                myGameArea.stop();
+            }
+        }
+
+        function controlarMovimento(event) {
+            switch (event.key) {
+                case "w":
+                    movimento.cima = true;
+                    break;
+                case "a":
+                    movimento.esquerda = true;
+                    break;
+                case "s":
+                    movimento.baixo = true;
+                    break;
+                case "d":
+                    movimento.direita = true;
+                    break;
+                case "ArrowUp":
+                    movimentoBola2.cima = true;
+                    break;
+                case "ArrowLeft":
+                    movimentoBola2.esquerda = true;
+                    break;
+                case "ArrowDown":
+                    movimentoBola2.baixo = true;
+                    break;
+                case "ArrowRight":
+                    movimentoBola2.direita = true;
+                    break;
+            }
+        }
+
+        function pararMovimento(event) {
+            switch (event.key) {
+                case "w":
+                    movimento.cima = false;
+                    break;
+                case "a":
+                    movimento.esquerda = false;
+                    break;
+                case "s":
+                    movimento.baixo = false;
+                    break;
+                case "d":
+                    movimento.direita = false;
+                    break;
+                case "ArrowUp":
+                    movimentoBola2.cima = false;
+                    break;
+                case "ArrowLeft":
+                    movimentoBola2.esquerda = false;
+                    break;
+                case "ArrowDown":
+                    movimentoBola2.baixo = false;
+                    break;
+                case "ArrowRight":
+                    movimentoBola2.direita = false;
+                    break;
+            }
+        }
+    </script>
+</head>
+
+<body onload="startGame();">
+    <div class="instrucoes">
+        <p>Bola Azul: controle com teclas <strong>WASD</strong></p>
+        <p>Bola Vermelha: controle com as <strong>Setas do Teclado</strong></p>
+    </div>
+</body>
+</html>
